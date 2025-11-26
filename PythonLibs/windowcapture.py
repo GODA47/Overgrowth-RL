@@ -26,17 +26,19 @@ class WindowCapture:
         self.h = config['WINDOW_HEIGHT']
 
         # account for the window border and titlebar and cut them off
-        border_pixels = 8
-        titlebar_pixels = 30
+        border_pixels = 1
+        titlebar_pixels = 31
         self.w = self.w - (border_pixels * 2)
         self.h = self.h - titlebar_pixels - border_pixels
-        self.cropped_x = border_pixels
+        self.cropped_x = border_pixels+8
         self.cropped_y = titlebar_pixels
 
         # set the cropped coordinates offset so we can translate screenshot
         # images into actual screen positions
         self.offset_x = window_rect[0] + self.cropped_x
         self.offset_y = window_rect[1] + self.cropped_y
+        print(window_rect)
+        print('Window size: {}x{}'.format(self.w, self.h))
 
     def get_screenshot(self):
 
