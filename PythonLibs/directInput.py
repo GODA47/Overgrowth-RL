@@ -41,11 +41,39 @@ def PressKey(hexKeyCode):
     ii_ = Input_I()
     ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra) )
     x = Input( ctypes.c_ulong(1), ii_ )
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 def ReleaseKey(hexKeyCode):
     extra = ctypes.c_ulong(0)
     ii_ = Input_I()
     ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra) )
     x = Input( ctypes.c_ulong(1), ii_ )
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def PressLMB():
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.mi = MouseInput(0, 0, 0, 0x0002, 0, ctypes.pointer(extra))
+    x = Input(ctypes.c_ulong(0), ii_)
+    SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def ReleaseLMB():
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.mi = MouseInput(0, 0, 0, 0x0004, 0, ctypes.pointer(extra))
+    x = Input(ctypes.c_ulong(0), ii_)
+    SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def PressRMB():
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.mi = MouseInput(0, 0, 0, 0x0008, 0, ctypes.pointer(extra))
+    x = Input(ctypes.c_ulong(0), ii_)
+    SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def ReleaseRMB():
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.mi = MouseInput(0, 0, 0, 0x0010, 0, ctypes.pointer(extra))
+    x = Input(ctypes.c_ulong(0), ii_)
+    SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))

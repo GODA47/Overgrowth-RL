@@ -55,12 +55,13 @@ class OvergrowthEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(len(characterActions.action_list))
         self.observation_space = gym.spaces.Box(0, 255, [windowCaptureConfig['WINDOW_WIDTH'],
                                                          windowCaptureConfig['WINDOW_HEIGHT'], 3], dtype=np.uint8)
-
+        # To-do: define player controller config
         self.playerStateController = PlayerStateController(playerControllerConfig)
         self.playerState = {}
         self.previousState = self.playerStateController.getPlayerState()
         self.currentState = {}
 
+        # To-do: define penalties
         self.penaltiesCounter = {'movement': 0}
 
         try:

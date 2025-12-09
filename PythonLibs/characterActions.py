@@ -6,26 +6,60 @@ from threading import Thread
 TIMEWAIT_BETWEEN_PRESS_RELEASE = 0.03
 TIMEWAIT_BETWEEN_ACTION_CHAIN = 0
 
-# scancodes of the keys used in darksouls3
-ds3_keys = {
-    'W': 0x11,
-    'A': 0x1E,
-    'S': 0x1F,
-    'D': 0x20,
-    'E': 0x12,
-    'ROLL': 0x08,
-    'attack': 0x9,
-    'sAttack': 0x0A,
-    'lock_on': 0x10,
-    'use_item': 0x13,
-    'switch_item': 0x0b,
-    'two_hand_weapon': 0x21
+# scancodes of the keys used in overgrowth
+ovg_keys = {
+    # 'W': 0x11,
+    # 'A': 0x1E,
+    # 'S': 0x1F,
+    # 'D': 0x20,
+    # '': 0x12,
+    # 'ROLL': 0x08,
+    # 'attack': 0x9,
+    # 'sAttack': 0x0A,
+    # 'lock_on': 0x10,
+    # 'use_item': 0x13,
+    # 'switch_item': 0x0b,
+    # 'two_hand_weapon': 0x21,
+
+    'W' : 0x11,
+    'A' : 0x1E,
+    'S' : 0x1F,
+    'D' : 0x20,
+
+    'Space' : 0x39,
+    'LeftShift' : 0x2A,
+    'LeftCtrl'  : 0x1D,
+
+    'Enter' : 0x1C,
+    'L' : 0x26,
+    'Q' : 0x10,
+    'E' : 0x12,
+
+    'LMB_Down'  : 0x0002,
+    'LMB_Up'  : 0x0004,
+    'RMB_Down'  : 0x0008,
+    'RMB_Up'  : 0x0010
+}
+
+ovg_key_state = {
+    'W' : False,
+    'A' : False,
+    'S' : False,
+    'D' : False,
+
+    'Space' : False,
+    'LeftShift' : False,
+    'LeftCtrl'  : False,
+
+    'LMB'  : False,
+    'RMB'  : False
 }
 
 
 # Move Forward ----------------------------
 def moveForward():
-    directInput.PressKey(ds3_keys['W'])
+    directInput.PressKey(ovg_keys['W'])
+    ovg_key_state['W'] = True
 
 
 # to unlock the camera call this function again
@@ -38,7 +72,8 @@ def moveForward():
 
 # Move Backwards ----------------------------
 def moveBackwards():
-    directInput.PressKey(ds3_keys['S'])
+    directInput.PressKey(ovg_keys['S'])
+    ovg_key_state['S'] = True
 
 
 # def moveBackwards():
@@ -50,7 +85,8 @@ def moveBackwards():
 
 # Move Left ----------------------------
 def moveLeft():
-    directInput.PressKey(ds3_keys['A'])
+    directInput.PressKey(ovg_keys['A'])
+    ovg_key_state['A'] = True
 
 
 # def moveLeft():
@@ -62,7 +98,8 @@ def moveLeft():
 
 # Move Right ----------------------------
 def moveRight():
-    directInput.PressKey(ds3_keys['D'])
+    directInput.PressKey(ovg_keys['D'])
+    ovg_key_state['D'] = True
 
 
 # def moveRight():
@@ -73,31 +110,18 @@ def moveRight():
 
 # Stop Moving ----------------------------
 def _stopMoving():
-   
-    directInput.PressKey(ds3_keys['A'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['A'])
+    directInput.ReleaseKey(ovg_keys['A'])
+    ovg_key_state['A'] = False
 
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['D'])
+    ovg_key_state['D'] = False
 
-    
-    directInput.PressKey(ds3_keys['D'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['D'])
+    directInput.ReleaseKey(ovg_keys['S'])
+    ovg_key_state['S'] = False
 
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['W'])
+    ovg_key_state['W'] = False
 
-
-    directInput.PressKey(ds3_keys['S'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['S'])
-
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-
-    
-    directInput.PressKey(ds3_keys['W'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['W'])
 
 
 def stopMoving():
@@ -105,15 +129,99 @@ def stopMoving():
     stopMovingThread.start()
     return stopMovingThread
 
+def couch():
+    directInput.PressKey(ovg_keys['LeftShift'])
+    ovg_key_state['LeftShift'] = True
+def uncouch():
+    directInput.ReleaseKey(ovg_keys['LeftShift'])
+    ovg_key_state['LeftShift'] = False
+
+def walk():
+    directInput.PressKey(ovg_keys['LeftCtrl'])
+    ovg_key_state['LeftCtrl'] = True
+def unwalk():
+    directInput.ReleaseKey(ovg_keys['LeftCtrl'])
+    ovg_key_state['LeftCtrl'] = False
+
+def holdAttack():
+    directInput.PressLMB()
+    ovg_key_state['LMB'] = True
+def releaseAttack():
+    directInput.ReleaseLMB()
+    ovg_key_state['LMB'] = False
+
+def throwWeapon():
+    directInput.PressKey(ovg_keys['Q'])
+    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['Q'])
+
+def pickupWeapon():
+    directInput.PressKey(ovg_keys['Q'])
+    time.sleep(0.5)
+    directInput.ReleaseKey(ovg_keys['Q'])
+
+def unsheatheWeapon():
+    directInput.PressKey(ovg_keys['E'])
+    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['E'])
+
+def sheathWeapon():
+    directInput.PressKey(ovg_keys['E'])
+    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['E'])
+    
+def holdGuard():
+    directInput.PressRMB()
+    ovg_key_state['RMB'] = True
+def releaseGuard():
+    directInput.ReleaseRMB()
+    ovg_key_state['RMB'] = False
+
+def holdJump():
+    directInput.PressKey(ovg_keys['Space'])
+    ovg_key_state['Space'] = True
+def releaseJump():
+    directInput.ReleaseKey(ovg_keys['Space'])
+    ovg_key_state['Space'] = False
+
+def roll():
+    if((ovg_key_state['A'] or ovg_key_state['D'] or ovg_key_state['W'] or ovg_key_state['S'])
+       and not (ovg_key_state['LeftShift'] or ovg_key_state['LeftCtrl'])):
+        directInput.PressKey(ovg_keys['LeftShift'])
+        time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+        directInput.ReleaseKey(ovg_keys['LeftShift'])
+
+def restartStage():
+    directInput.PressKey(ovg_keys['L'])
+    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['L'])
+
+def skipCutscene():
+    directInput.PressKey(ovg_keys['Enter'])
+    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+    directInput.ReleaseKey(ovg_keys['Enter'])
+
+def releaseAllKeys():
+    for key in ovg_key_state:
+        if ovg_key_state[key]:
+            if key == 'LMB':
+                directInput.ReleaseLMB()
+            elif key == 'RMB':
+                directInput.ReleaseRMB()
+            else:
+                directInput.ReleaseKey(ovg_keys[key])
+            ovg_key_state[key] = False
+
+
 
 # -------------------------------------------
 
 
 # Lock Camera  -------------------------------
-def lockCameraOnMonster():
-    directInput.PressKey(ds3_keys['lock_on'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['lock_on'])
+# def lockCameraOnMonster():
+#     directInput.PressKey(ds3_keys['lock_on'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['lock_on'])
 
 
 # to unlock the camera call this function again
@@ -125,13 +233,12 @@ def lockCameraOnMonster():
 
 
 # Attack --------------------------------------
-def attack():
-    _stopMoving()
-    directInput.PressKey(ds3_keys['attack'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['attack'])
+# def attack():
+#     _stopMoving()
+#     directInput.PressLMB()
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseLMB()
     # time.sleep(0.9)
-
 
 # def attack():
 #    attackThread = Thread(target = _attack, args = [])
@@ -141,10 +248,10 @@ def attack():
 
 
 # Strong Attack -------------------------------
-def strongAttack():
-    directInput.PressKey(ds3_keys['sAttack'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['sAttack'])
+# def strongAttack():
+#     directInput.PressKey(ds3_keys['sAttack'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['sAttack'])
     # time.sleep(2)
 
 
@@ -155,14 +262,14 @@ def strongAttack():
 # ---------------------------------------------
 
 # Roll Forward ---------------------------------
-def rollForward():
-    _stopMoving()
-    directInput.PressKey(ds3_keys['W'])
-    directInput.PressKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['W'])
+# def rollForward():
+#     _stopMoving()
+#     directInput.PressKey(ds3_keys['W'])
+#     directInput.PressKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['W'])
     # time.sleep(1.3)
 
 
@@ -174,14 +281,14 @@ def rollForward():
 
 
 # Roll Backwards -------------------------------
-def rollBackwards():
-    _stopMoving()
-    directInput.PressKey(ds3_keys['S'])
-    directInput.PressKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['S'])
+# def rollBackwards():
+#     _stopMoving()
+#     directInput.PressKey(ds3_keys['S'])
+#     directInput.PressKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['S'])
     # time.sleep(1.3)
 
 
@@ -193,14 +300,14 @@ def rollBackwards():
 
 
 # Roll Left -------------------------------------
-def rollLeft():
-    _stopMoving()
-    directInput.PressKey(ds3_keys['A'])
-    directInput.PressKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['A'])
+# def rollLeft():
+#     _stopMoving()
+#     directInput.PressKey(ds3_keys['A'])
+#     directInput.PressKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['A'])
     # time.sleep(1.3)
 
 
@@ -212,14 +319,14 @@ def rollLeft():
 
 
 # Roll Right ---------------------------------
-def rollRight():
-    _stopMoving()
-    directInput.PressKey(ds3_keys['D'])
-    directInput.PressKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['ROLL'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['D'])
+# def rollRight():
+#     _stopMoving()
+#     directInput.PressKey(ds3_keys['D'])
+#     directInput.PressKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['ROLL'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['D'])
     # time.sleep(1.3)
 
 
@@ -231,10 +338,10 @@ def rollRight():
 
 
 # Two Hand Weapon ----------------------------
-def twoHandWeapon():
-    directInput.PressKey(ds3_keys['two_hand_weapon'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['two_hand_weapon'])
+# def twoHandWeapon():
+#     directInput.PressKey(ds3_keys['two_hand_weapon'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['two_hand_weapon'])
     # time.sleep(0.7)
 
 
@@ -247,10 +354,10 @@ def twoHandWeapon():
 
 
 # Use Item -----------------------------------
-def useItem():
-    directInput.PressKey(ds3_keys['use_item'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['use_item'])
+# def useItem():
+#     directInput.PressKey(ds3_keys['use_item'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['use_item'])
     # time.sleep(2)
 
 
@@ -261,10 +368,10 @@ def useItem():
 # -------------------------------------------
 
 # Switch consumable item ---------------------
-def switchItem():
-    directInput.PressKey(ds3_keys['switch_item'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['switch_item'])
+# def switchItem():
+#     directInput.PressKey(ds3_keys['switch_item'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['switch_item'])
 
 
 # def switchItem():
@@ -275,10 +382,10 @@ def switchItem():
 
 
 # Interact -----------------------------------
-def interact():
-    directInput.PressKey(ds3_keys['E'])
-    time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
-    directInput.ReleaseKey(ds3_keys['E'])
+# def interact():
+#     directInput.PressKey(ds3_keys['E'])
+#     time.sleep(TIMEWAIT_BETWEEN_PRESS_RELEASE)
+#     directInput.ReleaseKey(ds3_keys['E'])
 
 
 # def interact():
@@ -289,14 +396,14 @@ def interact():
 
 
 # Cancel Every Action ------------------------
-def _cancelActions():
-    for key in ds3_keys:
-        directInput.ReleaseKey(ds3_keys[key])
+# def _cancelActions():
+#     for key in ds3_keys:
+#         directInput.ReleaseKey(ds3_keys[key])
 
 
 
 def cancelActions():
-    cancelActionsThread = Thread(target=_cancelActions, args=[])
+    cancelActionsThread = Thread(target=releaseAllKeys, args=[])
     cancelActionsThread.start()
     return cancelActionsThread
 
@@ -322,11 +429,26 @@ def cancelActions():
 #                    }
 
 action_dictionary = {
-                     'attack': attack,
-                     'rollForward': rollForward,
-                     'rollBackwards': rollBackwards,
-                     'rollLeft': rollLeft,
-                     'rollRight': rollRight
-                     }
+    'moveForward': moveForward,
+    'moveBackwards': moveBackwards,
+    'moveLeft': moveLeft,
+    'moveRight': moveRight,
+    'stopMoving': stopMoving,
+    'holdAttack': holdAttack,
+    'releaseAttack': releaseAttack,
+    'holdGuard': holdGuard,
+    'releaseGuard': releaseGuard,
+    'holdJump': holdJump,
+    'releaseJump': releaseJump,
+    'roll': roll,
+    'couch': couch,
+    'uncouch': uncouch,
+    'walk': walk,
+    'unwalk': unwalk,
+    # 'throwWeapon': throwWeapon,
+    # 'pickupWeapon': pickupWeapon,
+    # 'unsheatheWeapon': unsheatheWeapon,
+    # 'sheathWeapon': sheathWeapon,
+    }
 
 action_list = list(action_dictionary.values())

@@ -1,4 +1,5 @@
-import dsSocket
+# import dsSocket
+import PythonLibs.ovgSocket as ovgSocket
 import characterActions
 import time
 import logging
@@ -35,45 +36,40 @@ class PlayerStateController:
     '''
 
     def __init__(self, config):
-        self.game_variables = [
-            'playerPermHP',
-            'playerBlockHP',
-            'playerBloodHP',
-            'playerKOShield',
-            'playerMaxKOShield'
-            'playerAnimation',
-            'playerXaxis',
-            'playerZaxis',
-            'playerYaxis',
-            'PlayerKnockedOut',
-            'EnemyKnockedOut',
-        ]
-        '''
-        Gundyr world flag is stored in a byte,
-        MSB is defeated
-        2nd MSB is encountered
-        3rd MSB is pulled sword
-        so 01100000  = 96 means undefeated, enountered, pulled sword
-        '''
-        # self.gundyrFlags = {'Default': 96,
-        #                     'Dead': 224,
-        #                     'Alive': 127}
         self.config = config
+        self.enemy_num = self.config['enemyNum']
+        self.active_enemies = self.enemy_num
+        self.actor_variables = dict()
+
+        # for i in range(self.enemy_num):
+        #     self.game_variables[f'Enemy{i+1}'] = {
+        #         'permHealth': 0,
+        #         'tempHealth': 0,
+        #         'isKnockedOut': False,
+        #     }
+        # [
+        #     'playerPermHealth',
+        #     'playerTempHealth',
+        #     'playerIsKnockedOut',
+        #     'EnemyPermHealth',
+        #     'EnemyTempHealth',
+        #     'EnemyKnockedOut',
+        # ]
 
     # returns object received from get server
     def getPlayerState(self):
-        client = dsSocket.connectToServer(self.config['ip'], self.config['ports']['get'])
-        Object = dsSocket.recvDSRLObject(client)
+        client = ovgSocket.connectToServer(self.config['connectionString'])
+        Object = ovgSocket.recvOVGRLObject(client)
         client.close()
 
         return Object
 
     # x, y, z = float, float, float
-    def setPlayerPosition(self, x, y, z):
-        client = dsSocket.connectToServer(self.config['ip'], self.config['ports']['set'])
-        posObject = {self.game_variables[4]: x, self.game_variables[5]: z, self.game_variables[6]: y}
-        dsSocket.sendDSRLObject(client, posObject)
-        client.close()
+    # def setPlayerPosition(self, x, y, z):
+    #     client = dsSocket.connectToServer(self.config['ip'], self.config['ports']['set'])
+    #     posObject = {self.game_variables[4]: x, self.game_variables[5]: z, self.game_variables[6]: y}
+    #     dsSocket.sendDSRLObject(client, posObject)
+    #     client.close()
 
     def lockCameraOnBoss(self):
         characterActions.lockCameraOnMonster()

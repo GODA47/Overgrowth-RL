@@ -1,6 +1,6 @@
 import numpy as np
 import win32gui, win32ui, win32con
-
+import time
 
 class WindowCapture:
 
@@ -93,3 +93,7 @@ class WindowCapture:
     # the __init__ constructor.
     def get_screen_position(self, pos):
         return (pos[0] + self.offset_x, pos[1] + self.offset_y)
+    
+    def focus_window(self):
+        win32gui.SetForegroundWindow(self.hwnd)
+        time.sleep(0.05)
