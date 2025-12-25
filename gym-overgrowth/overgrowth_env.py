@@ -102,7 +102,7 @@ class OvergrowthEnv(gym.Env):
         return self.gameWindow.get_screenshot(), reward, done, 0
 
     def reset(self):
-        self.playerStateController.resetWorldState()
+        self.playerStateController.resetStage()
         return self.gameWindow.get_screenshot()
 
     def render(self, mode="human"):
