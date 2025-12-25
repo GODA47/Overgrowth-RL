@@ -20,18 +20,28 @@ def recvMessage(socket):
 def recvOVGRLObject(socket):
     OVGRLObject = {}
     movementObjects = json.loads(recvMessage(socket))
-    OVGRLObject['enemies'] = {}
+    for entity in {'player','enemy'}:
+        OVGRLObject[entity] = {}
+        OVGRLObject[entity]['permHealth'] = -1
+        OVGRLObject[entity]['tempHealth'] = -1
+        OVGRLObject[entity]['koShield'] = -1
+        OVGRLObject[entity]['isKnockedOut'] = -1
+
     for obj in movementObjects:
         if obj['is_player']:
-            OVGRLObject['player'] = {}
             OVGRLObject['player']['permHealth'] = obj['perm_health']
             OVGRLObject['player']['tempHealth'] = obj['temp_health']
+            OVGRLObject['player']['koShield'] = obj['ko_shield']
             OVGRLObject['player']['isKnockedOut'] = obj['is_knocked_out']
         else:
-            OVGRLObject['enemies'][obj['id']] = {}
-            OVGRLObject['enemies'][obj['id']]['permHealth'] = obj['perm_health']
-            OVGRLObject['enemies'][obj['id']]['tempHealth'] = obj['temp_health']
-            OVGRLObject['enemies'][obj['id']]['isKnockedOut'] = obj['is_knocked_out']
+            # OVGRLObject['enemies'][obj['id']] = {}
+            # OVGRLObject['enemies'][obj['id']]['permHealth'] = obj['perm_health']
+            # OVGRLObject['enemies'][obj['id']]['tempHealth'] = obj['temp_health']
+            # OVGRLObject['enemies'][obj['id']]['isKnockedOut'] = obj['is_knocked_out']
+            OVGRLObject['enemies']['permHealth'] = obj['perm_health']
+            OVGRLObject['enemies']['tempHealth'] = obj['temp_health']
+            OVGRLObject['enemies']['koShield'] = obj['ko_shield']
+            OVGRLObject['enemies']['isKnockedOut'] = obj['is_knocked_out']
     
     return OVGRLObject
 

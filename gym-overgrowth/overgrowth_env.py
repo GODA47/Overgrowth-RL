@@ -5,7 +5,7 @@ import cv2 as cv
 import logging
 sys.path.insert(1, '..//PythonLibs')
 sys.path.insert(1, '..//PythonLibs//SQLite3')
-from darksouls3playerState import PlayerStateController
+from overgrowthplayerState import PlayerStateController
 import characterActions
 from windowcapture import WindowCapture
 
@@ -15,36 +15,44 @@ windowCaptureConfig = {
     'WIDNOW_NAME': 'Overgrowth'
 }
 
+# playerControllerConfig = {
+    # 'bossName': 'Iudex Gundy',
+    # 'bossFogDoor': {
+    #     'x': 125.6999969,
+    #     'y': 558.2000122,
+    #     'z': -64.05046844
+    # },
+    # 'inFrontOfBoss': {
+    #     'x': 133.6301727,
+    #     'y': 579.1668701,
+    #     'z': -68.48419952
+    # },
+
+    # 'ports': {
+    #     'get': 64501,
+    #     'set': 64502
+    # },
+
+    # 'penalties': {
+    #     'movement': 15
+    # },
+
+    # 'ip': 'localhost',
+
+
+    # 'loadingScreenTime': 10,
+
+    # 'lockCameraAfterAnimations': ['ThrowDef'],
+
+    # 'attackAnimations': ['AttackRightLight1', 'AttackRightLight2', 'AttackRightLight3']
+# }
 playerControllerConfig = {
-    'bossName': 'Iudex Gundy',
-    'bossFogDoor': {
-        'x': 125.6999969,
-        'y': 558.2000122,
-        'z': -64.05046844
+    'connectionString': '"tcp://localhost:5555"',
+    'rewardMulti': {
+        'permHealth': 1.0,
+        'tempHealth': 0.05,
+        'koShield': 0.3
     },
-    'inFrontOfBoss': {
-        'x': 133.6301727,
-        'y': 579.1668701,
-        'z': -68.48419952
-    },
-
-    'ports': {
-        'get': 64501,
-        'set': 64502
-    },
-
-    'penalties': {
-        'movement': 15
-    },
-
-    'ip': 'localhost',
-
-    'loadingScreenTime': 20,
-
-    'lockCameraAfterAnimations': ['ThrowDef'],
-
-    'attackAnimations': ['AttackRightLight1', 'AttackRightLight2', 'AttackRightLight3']
-
 }
 
 
@@ -62,7 +70,7 @@ class OvergrowthEnv(gym.Env):
         self.currentState = {}
 
         # To-do: define penalties
-        self.penaltiesCounter = {'movement': 0}
+        # self.penaltiesCounter = {'movement': 0}
 
         try:
             self.gameWindow = WindowCapture(windowCaptureConfig)
@@ -76,8 +84,8 @@ class OvergrowthEnv(gym.Env):
         characterActions.action_list[action]()  # executing action
         self.currentState = self.playerStateController.getPlayerState()
 
-        if self.currentState['targetedEntityHP'] == -1:
-            raise Exception('Error has occured when teleporting to {}'.format(playerControllerConfig['bossName']))
+        if self.currentState['enemy']['isKnockedOut'] == -1:
+            raise Exception('Error has occured when startign the stage')
 
         done = False
 
@@ -86,8 +94,8 @@ class OvergrowthEnv(gym.Env):
         if self.checkEndOfEpisode():
             done = True
 
-        if self.currentState['playerAnimation'] in playerControllerConfig['lockCameraAfterAnimations']:
-            self.playerStateController.lockCameraOnBoss()
+        # if self.currentState['playerAnimation'] in playerControllerConfig['lockCameraAfterAnimations']:
+        #     self.playerStateController.lockCameraOnBoss()
 
         self.previousState = self.currentState
 
@@ -114,38 +122,40 @@ class OvergrowthEnv(gym.Env):
         return self.currentState['playerHP'] <= 0 or \
                self.currentState['playerAnimation'] == 'DeathStart' or \
                self.currentState['targetedEntityHP'] == 0
-
+    def getDelta(self, char, attr):
+        return self.previousState[char][attr] - self.currentState[char][attr]
+    
     def getReward(self):
         reward = 0
 
-        if self.currentState['playerHP'] < self.previousState['playerHP']:
-            reward -= 50
+        reward += playerControllerConfig['rewardMulti']['permHealth'] * \
+            (self.getDelta('enemy','permHealth') - self.getDelta('player', 'permHealth'))
+        
+        reward += playerControllerConfig['rewardMulti']['tempHealth'] * \
+            (self.getDelta('enemy','tempHealth') - self.getDelta('player', 'tempHealth'))
+        
+        if self.getDelta('player','koShield') > 0 and self.previousState['player']['koShield'] > 0:
+            reward -= playerControllerConfig['rewardMulti']['koShield']
 
-        if self.currentState['playerHP'] == 0:
-            reward -= 500
+        if self.getDelta('enemy','koShield') > 0 and self.previousState['enemy']['koShield'] > 0:
+            reward += playerControllerConfig['rewardMulti']['koShield']
 
-        if self.currentState['targetedEntityHP'] < self.previousState['targetedEntityHP']:
-            reward += 60
+        # # increment penalties
+        # if self.currentState['playerAnimation'] == 'Move':
+        #     self.penaltiesCounter['movement'] += 1
 
-        if self.currentState['targetedEntityHP'] == 0:
-            reward += 500
-
-        # increment penalties
-        if self.currentState['playerAnimation'] == 'Move':
-            self.penaltiesCounter['movement'] += 1
-
-        if self.penaltiesCounter['movement'] > playerControllerConfig['penalties']['movement']:
-            self.penaltiesCounter['movement'] = 0
-            reward -= 10
+        # if self.penaltiesCounter['movement'] > playerControllerConfig['penalties']['movement']:
+        #     self.penaltiesCounter['movement'] = 0
+        #     reward -= 10
 
         return reward
 
     def _StateHasErrors(self, currentState):
-        if 'playerHP' not in currentState or \
-                'playerStamina' not in currentState or \
-                'playerAnimation' not in currentState or \
-                'targetedEntityHP' not in currentState:
-            return True
+        # if 'playerHP' not in currentState or \
+        #         'playerStamina' not in currentState or \
+        #         'playerAnimation' not in currentState or \
+        #         'targetedEntityHP' not in currentState:
+        #     return True
 
         return False
 

@@ -129,10 +129,10 @@ def stopMoving():
     stopMovingThread.start()
     return stopMovingThread
 
-def couch():
+def crouch():
     directInput.PressKey(ovg_keys['LeftShift'])
     ovg_key_state['LeftShift'] = True
-def uncouch():
+def uncrouch():
     directInput.ReleaseKey(ovg_keys['LeftShift'])
     ovg_key_state['LeftShift'] = False
 
@@ -441,8 +441,8 @@ action_dictionary = {
     'holdJump': holdJump,
     'releaseJump': releaseJump,
     'roll': roll,
-    'couch': couch,
-    'uncouch': uncouch,
+    'crouch': crouch,
+    'uncrouch': uncrouch,
     'walk': walk,
     'unwalk': unwalk,
     # 'throwWeapon': throwWeapon,

@@ -13,8 +13,10 @@ windowCaptureConfig = {
 }
 
 gameWindow = WindowCapture(windowCaptureConfig)
-# print(gameWindow.hwnd)
-# cv.imwrite('screenshot.png', gameWindow.get_screenshot())
+print(gameWindow.hwnd)
+cv.imwrite('screenshot.png', gameWindow.get_screenshot())
+
+# -------------------------------------------------------------------------------------------
 
 import characterActions
 
@@ -24,6 +26,30 @@ characterActions.skipCutscene()
 characterActions.moveForward()
 time.sleep(2)
 characterActions._stopMoving()
+time.sleep(0.5)
+characterActions.moveLeft()
+time.sleep(2)
+characterActions._stopMoving()
+time.sleep(0.5)
+characterActions.moveRight()
+time.sleep(2)
+characterActions._stopMoving()
+time.sleep(0.5)
+characterActions.crouch()
+time.sleep(0.1)
+characterActions.moveBackwards()
+time.sleep(2)
+characterActions.moveRight()
+time.sleep(2)
+characterActions._stopMoving()
+time.sleep(1)
+characterActions.uncrouch()
+time.sleep(0.5)
+characterActions.holdJump()
+time.sleep(0.5)
+characterActions.releaseJump()
+
+
 
 
 # a = {'key1': 1}
