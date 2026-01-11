@@ -1,20 +1,20 @@
-import gym
+import gymnasium as gym
 import sys
 import numpy as np
 import cv2 as cv
 import logging
-sys.path.insert(1, '..//PythonLibs')
-sys.path.insert(1, '..//PythonLibs//SQLite3')
-from overgrowthplayerState import PlayerStateController
-import characterActions
-from windowcapture import WindowCapture
+sys.path.insert(2, '..//PythonLibs')
+sys.path.insert(3, '..//PythonLibs//SQLite3')
+from PythonLibs.overgrowthplayerState import PlayerStateController
+from PythonLibs import characterActions
+from PythonLibs.windowcapture import WindowCapture
 
 windowCaptureConfig = {
     'WINDOW_WIDTH': 1282,
     'WINDOW_HEIGHT': 752,
     'WIDNOW_NAME': 'Overgrowth'
 }
-
+{
 # playerControllerConfig = {
     # 'bossName': 'Iudex Gundy',
     # 'bossFogDoor': {
@@ -46,13 +46,19 @@ windowCaptureConfig = {
 
     # 'attackAnimations': ['AttackRightLight1', 'AttackRightLight2', 'AttackRightLight3']
 # }
+}
 playerControllerConfig = {
-    'connectionString': '"tcp://localhost:5555"',
+    'connectionString': "tcp://localhost:5555",
     'rewardMulti': {
         'permHealth': 1.0,
         'tempHealth': 0.05,
         'koShield': 0.3
     },
+    'loseReward': -10,
+    'winReward': 10,
+    'timeoutReward': -0.1,
+    'loadingScreenTime': 1,
+    'MAX_STEPS': 900,
 }
 
 
@@ -68,6 +74,7 @@ class OvergrowthEnv(gym.Env):
         self.playerState = {}
         self.previousState = self.playerStateController.getPlayerState()
         self.currentState = {}
+        self.stepCount= 0
 
         # To-do: define penalties
         # self.penaltiesCounter = {'movement': 0}
@@ -78,7 +85,8 @@ class OvergrowthEnv(gym.Env):
             print(exeption)
 
     def just_step(self, action):
-        characterActions.action_list[action]()  # executing action
+        characterActions.action_list[action]()  # executing action\
+        self.stepCount += 1
 
     def step(self, action):
         characterActions.action_list[action]()  # executing action
@@ -90,12 +98,14 @@ class OvergrowthEnv(gym.Env):
         done = False
 
         reward = self.getReward()
+        self.stepCount += 1
 
         if self.checkEndOfEpisode():
             done = True
 
-        # if self.currentState['playerAnimation'] in playerControllerConfig['lockCameraAfterAnimations']:
-        #     self.playerStateController.lockCameraOnBoss()
+        if self.stepCount >= playerControllerConfig['MAX_STEPS']:
+            done = True
+            reward += playerControllerConfig['timeoutReward']
 
         self.previousState = self.currentState
 
@@ -119,9 +129,9 @@ class OvergrowthEnv(gym.Env):
         return
 
     def checkEndOfEpisode(self):
-        return self.currentState['playerHP'] <= 0 or \
-               self.currentState['playerAnimation'] == 'DeathStart' or \
-               self.currentState['targetedEntityHP'] == 0
+        return self.currentState['player']['isKnockedOut'] or \
+               self.currentState['enemy']['isKnockedOut'] 
+    
     def getDelta(self, char, attr):
         return self.previousState[char][attr] - self.currentState[char][attr]
     
@@ -139,6 +149,12 @@ class OvergrowthEnv(gym.Env):
 
         if self.getDelta('enemy','koShield') > 0 and self.previousState['enemy']['koShield'] > 0:
             reward += playerControllerConfig['rewardMulti']['koShield']
+
+        if self.currentState['player']['isKnockedOut']:
+            reward += playerControllerConfig['loseReward']
+        
+        if self.currentState['enemy']['isKnockedOut']:
+            reward += playerControllerConfig['winReward']
 
         # # increment penalties
         # if self.currentState['playerAnimation'] == 'Move':

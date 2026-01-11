@@ -1,6 +1,6 @@
 # import dsSocket
 import PythonLibs.ovgSocket as ovgSocket
-import characterActions
+from PythonLibs import characterActions
 import time
 import logging
 
@@ -114,7 +114,10 @@ class PlayerStateController:
     #     time.sleep(0.5)
     #     self.resetPositionToBoss()
     def resetStage(self):
-        characterActions.releaseAllKeys()
+        self.releaseAllKeys()
         time.sleep(0.5)
         characterActions.restartStage()
         time.sleep(self.config['loadingScreenTime'] + 1)
+    
+    def releaseAllKeys(self):
+        characterActions.releaseAllKeys()

@@ -38,10 +38,10 @@ def recvOVGRLObject(socket):
             # OVGRLObject['enemies'][obj['id']]['permHealth'] = obj['perm_health']
             # OVGRLObject['enemies'][obj['id']]['tempHealth'] = obj['temp_health']
             # OVGRLObject['enemies'][obj['id']]['isKnockedOut'] = obj['is_knocked_out']
-            OVGRLObject['enemies']['permHealth'] = obj['perm_health']
-            OVGRLObject['enemies']['tempHealth'] = obj['temp_health']
-            OVGRLObject['enemies']['koShield'] = obj['ko_shield']
-            OVGRLObject['enemies']['isKnockedOut'] = obj['is_knocked_out']
+            OVGRLObject['enemy']['permHealth'] = obj['perm_health']
+            OVGRLObject['enemy']['tempHealth'] = obj['temp_health']
+            OVGRLObject['enemy']['koShield'] = obj['ko_shield']
+            OVGRLObject['enemy']['isKnockedOut'] = obj['is_knocked_out']
     
     return OVGRLObject
 

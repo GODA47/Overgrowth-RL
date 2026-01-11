@@ -1,4 +1,4 @@
-import directInput  # PressKey(scanCode) & ReleaseKey(scanCode)
+from PythonLibs import directInput  # PressKey(scanCode) & ReleaseKey(scanCode)
 import time
 from threading import Thread
 
@@ -202,6 +202,8 @@ def skipCutscene():
     directInput.ReleaseKey(ovg_keys['Enter'])
 
 def releaseAllKeys():
+    # print("Releasing all keys")
+    # print(ovg_key_state)
     for key in ovg_key_state:
         if ovg_key_state[key]:
             if key == 'LMB':
@@ -211,6 +213,8 @@ def releaseAllKeys():
             else:
                 directInput.ReleaseKey(ovg_keys[key])
             ovg_key_state[key] = False
+    # print("All keys released")
+    # print(ovg_key_state)
 
 
 
