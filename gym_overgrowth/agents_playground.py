@@ -5,6 +5,7 @@ This module trains the DQN agent by trial and error. In this module the DQN
 agent will play the game episode by episode, store the gameplay experiences
 and then use the saved gameplay experiences to train the underlying model.
 """
+import sys
 from sqlite_training_data_logger import TrainigDataLogger
 from frame_stack_wrapper import FrameStack, LazyFrames2D
 from overgrowth_env import OvergrowthEnv
@@ -20,7 +21,6 @@ import signal
 import errno
 import time
 import csv
-import sys
 import os
 
 def save_state_csv(csv_name, row):
@@ -77,7 +77,11 @@ logging.basicConfig(
 def preprocess_state(state):
 
     #return np.reshape(cv.resize(np.array(state)[100:690,550:900], (config.IMAGE_SHAPE[1],config.IMAGE_SHAPE[0])),(1,150,93,12))
-    return np.reshape(cv.resize(np.array(state)[100:690,550:900], (config.IMAGE_SHAPE[1],config.IMAGE_SHAPE[0])),config.STACKED_IMAGE_SHAPE)
+    # return np.reshape(cv.resize(np.array(state)[100:690,550:900], (config.IMAGE_SHAPE[1],config.IMAGE_SHAPE[0])),config.STACKED_IMAGE_SHAPE)
+    frame = np.asarray(state,dtype=np.uint8)
+    frame = frame[100:690,550:900]
+    frame = cv.resize(frame, (config.IMAGE_SHAPE[1],config.IMAGE_SHAPE[0]))
+    return frame.reshape(config.STACKED_IMAGE_SHAPE)
 
 
 def collect_gameplay_experiences(env, agent, buffer, storing_table):
@@ -101,13 +105,14 @@ def collect_gameplay_experiences(env, agent, buffer, storing_table):
         start_episode_time = time.perf_counter()
         time_of_execution = time.time()
         while done == False and number_of_steps_taken  <= config.MAX_STEPS_PER_EPISODE:
+            logging.debug(f"time_of_execution: {time_of_execution} | time delta: {time.time() - time_of_execution}")
             if time.time() - time_of_execution >= config.OBSCURING_FACTOR:
                 action = agent.collect_policy(state)
                 next_state, reward, done, _ = env.step(action)
                 preProcessedNextState = preprocess_state(next_state)
                 buffer.store_gameplay_experience(state, preProcessedNextState, reward, action, done)
                 training_data_logger.enqueue_experience_data(EPOCH_NUMBER,EPISODE_NUMBER,reward,action,agent.epsilon)
-                logging.debug('Saving the experiences\n {0} | {1} | {2} | {3} | {4} | {5}'.format(state.shape,preProcessedNextState.shape,reward,action,done,agent.epsilon))
+                logging.debug(f'Saving the experiences\n {state.shape} | {preProcessedNextState.shape} | {reward} | {action} | {done} | {agent.epsilon}')
                 state = preProcessedNextState
                 cumulated_reward += reward
                 number_of_steps_taken += 1
@@ -115,10 +120,16 @@ def collect_gameplay_experiences(env, agent, buffer, storing_table):
             else:
                 logging.debug('Executing the same action')
                 env.just_step(action)
+            # logging.info(f'Step number : {number_of_steps_taken}, Done: {done}, Cumulated reward : {cumulated_reward}, Epsilon : {agent.epsilon:.4g}')
+            
         end_episode_time = time.perf_counter()
         logging.info('Reward for this episode : {0} | Experiences collected : {1} | Episode took : {2:.3g} seconds to finish'.format(cumulated_reward,number_of_steps_taken,end_episode_time-start_episode_time))
 
-        if buffer.getExperiencesCount() > config.MIN_ACTIONS and number_of_steps_taken <= config.MAX_STEPS_PER_EPISODE and SAVE_EXPERIENCES:
+        logging.info(f'exp {buffer.getExperiencesCount()}/{config.MIN_ACTIONS}')
+        logging.info(f'steps {number_of_steps_taken}/{config.MAX_STEPS_PER_EPISODE}')
+        logging.info(f'save {SAVE_EXPERIENCES}')
+        # if buffer.getExperiencesCount() > config.MIN_ACTIONS and number_of_steps_taken <= config.MAX_STEPS_PER_EPISODE and SAVE_EXPERIENCES:
+        if buffer.getExperiencesCount() > config.MIN_ACTIONS and SAVE_EXPERIENCES:
             logging.info('Storing experiences...')
             buffer.store_in_database(storing_table)
             training_data_logger.log_experience_data(config.TRAINING_EXPERIENCES_DATA_TABLE)

@@ -1,13 +1,16 @@
 import gymnasium as gym
 import sys
+import os
 import numpy as np
 import cv2 as cv
 import logging
-sys.path.insert(2, '..//PythonLibs')
-sys.path.insert(3, '..//PythonLibs//SQLite3')
-from PythonLibs.overgrowthplayerState import PlayerStateController
-from PythonLibs import characterActions
-from PythonLibs.windowcapture import WindowCapture
+sys.path.insert(2, os.path.abspath('.//PythonLibs'))
+sys.path.insert(3, os.path.abspath('.//PythonLibs//SQLite3'))
+# print(sys.path)
+from overgrowthplayerState import PlayerStateController
+import characterActions
+from windowcapture import WindowCapture
+import config
 
 windowCaptureConfig = {
     'WINDOW_WIDTH': 1282,
@@ -58,7 +61,7 @@ playerControllerConfig = {
     'winReward': 10,
     'timeoutReward': -0.1,
     'loadingScreenTime': 1,
-    'MAX_STEPS': 900,
+    'MAX_STEPS': config.MAX_STEPS_PER_EPISODE,
 }
 
 
@@ -86,7 +89,7 @@ class OvergrowthEnv(gym.Env):
 
     def just_step(self, action):
         characterActions.action_list[action]()  # executing action\
-        self.stepCount += 1
+        # self.stepCount += 1
 
     def step(self, action):
         characterActions.action_list[action]()  # executing action
@@ -103,15 +106,16 @@ class OvergrowthEnv(gym.Env):
         if self.checkEndOfEpisode():
             done = True
 
-        if self.stepCount >= playerControllerConfig['MAX_STEPS']:
-            done = True
-            reward += playerControllerConfig['timeoutReward']
+        # if self.stepCount >= playerControllerConfig['MAX_STEPS']:
+        #     done = True
+        #     reward += playerControllerConfig['timeoutReward']
 
         self.previousState = self.currentState
 
         return self.gameWindow.get_screenshot(), reward, done, 0
 
     def reset(self):
+        self.gameWindow.focus_window()
         self.playerStateController.resetStage()
         return self.gameWindow.get_screenshot()
 

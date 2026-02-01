@@ -1,4 +1,4 @@
-from PythonLibs import directInput  # PressKey(scanCode) & ReleaseKey(scanCode)
+import directInput  # PressKey(scanCode) & ReleaseKey(scanCode)
 import time
 from threading import Thread
 

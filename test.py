@@ -2,11 +2,10 @@ import sys
 import numpy as np
 import cv2 as cv
 import time
+from PythonLibs.windowcapture import WindowCapture
 from gym_overgrowth.overgrowth_env import OvergrowthEnv
 import gymnasium as gym 
-
-sys.path.insert(1, './PythonLibs')
-from windowcapture import WindowCapture
+ 
 
 windowCaptureConfig = {
     'WINDOW_WIDTH': 1282,
@@ -18,6 +17,7 @@ gameWindow = WindowCapture(windowCaptureConfig)
 print(gameWindow.hwnd)
 cv.imwrite('screenshot.png', gameWindow.get_screenshot())
 
+
 # -------------------------------------------------------------------------------------------
 
 import characterActions
@@ -26,7 +26,7 @@ gameWindow.focus_window()
 env = OvergrowthEnv()
 env.reset()
 try:
-    for _ in range(1000):
+    for _ in range(100):
         action = env.action_space.sample()
         obs, reward, done, info = env.step(action)
         print(f"Action: {action}, Reward: {reward}, Done: {done}")

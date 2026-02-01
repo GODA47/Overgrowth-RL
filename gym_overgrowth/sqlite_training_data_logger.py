@@ -1,5 +1,7 @@
-import sys
-sys.path.insert(1, '..//PythonLibs//SQLite3')
+import sys,os
+# sys.path.insert(1, os.path.abspath('./'))
+sys.path.insert(1, os.path.abspath('.//PythonLibs//SQLite3'))
+# print(sys.path)
 from collections import deque
 import numpy as np
 from sqlite_3 import SQLite_3

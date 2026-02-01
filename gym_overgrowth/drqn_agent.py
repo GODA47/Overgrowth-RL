@@ -1,11 +1,12 @@
+import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
+from keras import layers
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, LSTM, TimeDistributed
 from interfaces.agent import Agent
-from keras.layers.convolutional import Conv2D
-from keras.backend import variable
+from keras.layers import Conv2D
 import numpy
+variable = tf.Variable
 
 class DrqnAgent(Agent):
     """

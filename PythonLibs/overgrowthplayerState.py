@@ -1,6 +1,6 @@
 # import dsSocket
-import PythonLibs.ovgSocket as ovgSocket
-from PythonLibs import characterActions
+import ovgSocket as ovgSocket
+import characterActions
 import time
 import logging
 
